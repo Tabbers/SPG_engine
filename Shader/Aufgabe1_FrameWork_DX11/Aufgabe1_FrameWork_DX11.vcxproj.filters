@@ -1,0 +1,296 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{2f0aec3b-d39c-4778-bc38-2e6b82758406}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{d885f220-4246-4683-a3ac-40ef7c808609}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{1bb9f1dd-1224-44e5-b096-ca029bffdb60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Math">
+      <UniqueIdentifier>{506c5f60-2e37-4873-8003-be21314c24a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\D3D">
+      <UniqueIdentifier>{e3008ba4-3ee4-4697-93ab-bd009386de9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\D3D">
+      <UniqueIdentifier>{78c77413-3eaa-4dcc-a57a-5843489ca90d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\D3D\Model">
+      <UniqueIdentifier>{73ba039d-7e95-4f29-b097-7c7f6632187c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\D3D\Model">
+      <UniqueIdentifier>{98bd0786-9e09-4360-9878-1d38b43beb60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\D3D\Rendering">
+      <UniqueIdentifier>{7d9327e1-13d6-472a-9c77-da68cff94eed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Math">
+      <UniqueIdentifier>{22983bae-0530-4516-9491-26c9f03f067c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\D3D\Rendering">
+      <UniqueIdentifier>{feeacb9a-c7da-4a68-8dec-a90dcb071cb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\D3D\Rendering\Shader">
+      <UniqueIdentifier>{4e2fd2a0-6600-49f8-b342-83fc8bf916ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\D3D\Rendering\Shader">
+      <UniqueIdentifier>{67e207b6-6bb3-4332-9329-bfb3678993bc}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="enginecore.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dc.h">
+      <Filter>Header Files\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dcamera.h">
+      <Filter>Header Files\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="graphicscore.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="path.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="pathpoint.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="gameobject.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>Header Files\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>Header Files\D3D\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dmodel.h">
+      <Filter>Header Files\D3D\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="d3drendertotexture.h">
+      <Filter>Header Files\D3D\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="colorshader.h">
+      <Filter>Header Files\D3D\Rendering\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="depthShader.h">
+      <Filter>Header Files\D3D\Rendering\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dmath.h">
+      <Filter>Header Files\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="lineShader.h">
+      <Filter>Header Files\D3D\Rendering\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="globaldefinitions.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>Header Files\D3D\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="modellibrary.h">
+      <Filter>Header Files\D3D\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="vertex.h">
+      <Filter>Header Files\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="collision.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="kdTree.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="line.h">
+      <Filter>Header Files\D3D\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleGenerationShader.h">
+      <Filter>Header Files\D3D\Rendering\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticelBillboardingShader.h">
+      <Filter>Header Files\D3D\Rendering\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Header Files\D3D\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumetricData.h">
+      <Filter>Header Files\D3D\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="generationShader.h">
+      <Filter>Header Files\D3D\Rendering\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="generatedModel.h">
+      <Filter>Header Files\D3D\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Randomizer.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferTypes.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="enginecore.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dmath.cpp">
+      <Filter>Source Files\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dc.cpp">
+      <Filter>Source Files\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dcamera.cpp">
+      <Filter>Source Files\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="graphicscore.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="pathpoint.cpp">
+      <Filter>Source Files\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="path.cpp">
+      <Filter>Source Files\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="gameobject.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="light.cpp">
+      <Filter>Source Files\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dmodel.cpp">
+      <Filter>Source Files\D3D\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>Source Files\D3D\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="d3drendertotexture.cpp">
+      <Filter>Source Files\D3D\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="colorshaderclass.cpp">
+      <Filter>Source Files\D3D\Rendering\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="depthShader.cpp">
+      <Filter>Source Files\D3D\Rendering\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="lineShader.cpp">
+      <Filter>Source Files\D3D\Rendering\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="modellibrary.cpp">
+      <Filter>Source Files\D3D\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>Source Files\D3D\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="vertex.cpp">
+      <Filter>Source Files\D3D\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="collision.cpp">
+      <Filter>Source Files\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="kdTree.cpp">
+      <Filter>Source Files\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="line.cpp">
+      <Filter>Source Files\D3D\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleGenerationShader.cpp">
+      <Filter>Source Files\D3D\Rendering\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticelBillboardingShader.cpp">
+      <Filter>Source Files\D3D\Rendering\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Source Files\D3D\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="generatedModel.cpp">
+      <Filter>Source Files\D3D\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="generationShader.cpp">
+      <Filter>Source Files\D3D\Rendering\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="LookUpTables.cpp">
+      <Filter>Source Files\D3D\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="VolumetricData.cpp">
+      <Filter>Source Files\D3D\Model</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Shaders\ps_line.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\vs_color.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\vs_depth.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\vs_line.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\ps_color.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\ps_depth.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\MarchingCubesGs.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\MarchingCubesPs.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\MarchingCubesVs.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\ParticleQuadifyVs.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\ParticleUpdateGS.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\ParticleUpdateVs.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\ParticleQuadifyGs.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Shaders\ParticleQuadifyPs.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
