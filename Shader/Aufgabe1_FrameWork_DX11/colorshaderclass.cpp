@@ -169,7 +169,7 @@ bool ColorShader::InitShader(ID3D11Device* device, HWND hwnd, CHAR* vsFilename, 
 
 	m_sampleFilter = static_cast<D3D11_FILTER>(m_filtervalues[m_filter]);
 	// Create a texture sampler state description.
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;

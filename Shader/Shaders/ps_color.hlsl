@@ -35,26 +35,59 @@ struct PixelInputType
 	float3 binormal          : BINORMAL;
 	float4 lightViewPosition : TEXCOORD1;
 	float3 lightPos          : TEXCOORD2;
+	float4 worldposition	 : Position;
 };
+
+float2 SampleShadowMap3By3(float2 uv)
+{
+	float2 result = 0.0f;
+	for (int x = -4; x < 4; ++x)
+	{
+		for (int y = -4; y < 4; ++y)
+		{
+			result += depthMapTexture.SampleLevel(SampleTypeClamp, uv, 0, int2(x,y)).xy;
+		}
+	}
+	result /= 64;
+	/*
+	for (int x = 0; x < 1; ++x)
+	{
+		for (int y = 0; y < 1; ++y)
+		{
+			result += depthMapTexture.SampleLevel(SampleTypeClamp, uv, 0, int2(x, y)).xy;
+		}
+	}
+	result /= 1;*/
+
+	return result;
+}
+
+float Linstep(float min, float max, float variance)
+{
+	float clampable = (variance - min) / (max - min);
+	return clamp(clampable, 0, 1);
+}
 
 float ChebyshevUpperBound(float2 Moments, float t, float minVariance)
 {
+	// Set the bias value for fixing the floating point precision issues.
+	float bias = 0.00002f;
   // One-tailed inequality valid if t > Moments.x  
     float p = (t <= Moments.x);
   // Compute variance.  
-    float Variance = (Moments.x * Moments.x) - Moments.y;
-    Variance = max(Variance, minVariance);
+    float Variance = max(Moments.y - (Moments.x * Moments.x), minVariance);
   // Compute probabilistic upper bound.  
-    float d = Moments.x - t;
-    float p_max = Variance / (Variance + d * d);
-    return max(p, p_max);
+    float d = t - Moments.x;
+    float p_max = Linstep(0.2, 1.0, Variance / (Variance + d * d));
+    return clamp(max(p, p_max),0.0f,1.0f);
 }
+
 float ShadowContribution(float2 LightTexCoord, float DistanceToLight, float minVariance)
 {
   // Read the moments from the variance shadow map.  
-    float2 Moments = depthMapTexture.Sample(SampleTypeClamp, LightTexCoord).xy;
+  float2 moments  = SampleShadowMap3By3(LightTexCoord);
   // Compute the Chebyshev upper bound.  
-    return ChebyshevUpperBound(Moments, DistanceToLight, minVariance);
+  return ChebyshevUpperBound(moments, DistanceToLight, minVariance);
 }
 
 float2 Displacement(float2 tsEyeVec, float2 uv)
@@ -124,9 +157,10 @@ float4 main(PixelInputType input) : SV_TARGET
 	float4 specular;
     float2 lightTextCoords;
     float distanceToLight;
-    float MinVariance = 0.00001f;
+    float MinVariance = 0.00002f;
 	specular = float4(0.0f,0.0f,0.0f,0.0f);
     float contribution = 1.0f;
+
     uv = input.tex;
 	if(drawNormal)
 	{
@@ -162,54 +196,44 @@ float4 main(PixelInputType input) : SV_TARGET
     //Sample Texture
     textureColor = objectTexture.SampleLevel(SampleTypeWrap, uv,0);
 
-	// Set the bias value for fixing the floating point precision issues.
-	bias = 0.00002f;
-
 	// Set the default output color to the ambient light value for all pixels.
     colorOut = ambientColor;
 	
 	// Calculate the projected texture coordinates.
 	projectTexCoord.x =  input.lightViewPosition.x / input.lightViewPosition.w / 2.0f + 0.5f;
-	projectTexCoord.y = -input.lightViewPosition.y / input.lightViewPosition.w / 2.0f + 0.5f;
+	projectTexCoord.y =  -input.lightViewPosition.y / input.lightViewPosition.w / 2.0f + 0.5f;
 
 	if((saturate(projectTexCoord.x) == projectTexCoord.x) && (saturate(projectTexCoord.y) == projectTexCoord.y))
 	{
-        distanceToLight = length(input.lightPos - input.position.xyz);
-		// Sample the shadow map depth value from the depth texture using the sampler at the projected texture coordinate location.
-		depthValue = depthMapTexture.Sample(SampleTypeClamp, projectTexCoord).r;
-
-        contribution = ShadowContribution(projectTexCoord, distanceToLight, MinVariance);
+		float bias = 0.1f;
 		// Calculate the depth of the light.
 		lightDepthValue = input.lightViewPosition.z / input.lightViewPosition.w;
 
-		// Subtract the bias from the lightDepthValue.
-		lightDepthValue = lightDepthValue - bias;
+		lightDepthValue -= bias;
 
-		// Compare the depth of the shadow map value and the depth of the light to determine whether to shadow or to light this pixel.
-		// If the light is in front of the object then light the pixel, if not then shadow this pixel since an object (occluder) is casting a shadow on it.
-		if(lightDepthValue < depthValue)
-		{
-		    // Calculate the amount of light on this pixel.
+		// Sample the shadow map depth value from the depth texture using the sampler at the projected texture coordinate location.
+		contribution = ShadowContribution(projectTexCoord, length(input.lightPos), MinVariance);
+
+		// Calculate the amount of light on this pixel.
         lightIntensity = saturate(dot(bumpNormal, input.lightPos));
 
-		    if(lightIntensity > 0.0f)
-			{
-				// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
-				colorOut += (diffuseColor * lightIntensity);
+		if(lightIntensity > 0.0f)
+		{
+			// Determine the final diffuse color based on the diffuse color and the amount of light intensity.
+			colorOut += (diffuseColor * lightIntensity);
 
-				// Saturate the final light color.
-				colorOut = saturate(colorOut);
+			// Saturate the final light color.
+			colorOut = saturate(colorOut);
 
-				//Calculate the reflection vector for the pixel
-				reflection = normalize(2 * lightIntensity * bumpNormal - lightDirection); 
+			//Calculate the reflection vector for the pixel
+			reflection = normalize(2 * lightIntensity * bumpNormal - lightDirection); 
 
-				//calculate specular component
-				specular = pow(saturate(dot(reflection, input.viewDir)), specularIntensity);
-				// Combine the light and texture color.
-			}
+			//calculate specular component
+			specular = pow(saturate(dot(reflection, input.viewDir)), specularIntensity);
+			// Combine the light and texture color.
 		}
 	}
 	colorOut = textureColor*colorOut;
 	if(drawSpec) colorOut  = saturate(colorOut + specular);
-    return colorOut * contribution;
+    return colorOut * (1-contribution);
 }

@@ -79,6 +79,7 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	D3Dmodel* m_Model8 = nullptr;
 	D3Dmodel* m_Model9 = nullptr;
 	D3Dmodel* m_Model10 = nullptr;
+	D3Dmodel* m_Model11 = nullptr;
 	ParticleSystem* ps = nullptr;
 
 	m_screenWidth = screenWidth;
@@ -130,7 +131,8 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	m_Model3 = new D3Dmodel(m_modelLib);
 	if (!m_Model3) return false;
 	result = m_Model3->Init("Data/sht/plane.sht", L"Texture/stones/text_ground.dds", L"Texture/stones/norm_ground.dds", L"Texture/stones/disp_ground.dds", m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot);
-	m_Model3->SetScale(10,1,10);
+	m_Model3->SetScale(25,1,25);
+	m_Model3->SetRenderOnShadowMap(false);
 	if (!result) return false;
 	m_renderable.push_back(m_Model3);
 
@@ -183,6 +185,17 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	m_Model9->SetScale(3, 3, 3);
 	if (!result) return false;
 	m_renderable.push_back(m_Model9);
+
+	tempPos = XMVectorSet(0.0f, 15.0f, 10.0f, 0.0f);
+	tempRot = XMQuaternionRotationRollPitchYaw(-PI/2, 0, 0);
+	m_Model11 = new D3Dmodel(m_modelLib);
+	if (!m_Model11) return false;
+	result = m_Model11->Init("Data/sht/plane.sht", L"Texture/stones/text_ground.dds", L"Texture/stones/norm_ground.dds", L"Texture/stones/disp_ground.dds", m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot);
+	m_Model11->SetScale(10, 1, 10);
+	m_Model11->SetRenderOnShadowMap(false);
+	if (!result) return false;
+	m_renderable.push_back(m_Model11);
+
 	m_RenderTexture = new D3DRenderToTexture();
 	if (!m_RenderTexture) return false;
 	result = m_RenderTexture->Init(m_Direct3DWrapper->GetDevice(),SHADOWMAP_WIDTH,SHADOWMAP_HEIGHT,
@@ -589,6 +602,7 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 		m_kdtree->Render(m_Direct3DWrapper->GetDeviceContext());
 		result = m_lineShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), m_kdtree->GetIndexCount(), sceneInfo);
 	}
+	unsigned int i = 0;
 	for each (D3Dmodel* model in m_renderable)
 	{
 		sceneInfo.DrawNormal = model->GetDrawNormalMap();
@@ -596,8 +610,17 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 		sceneInfo.DrawDisp = model->GetDrawDisp();
 		model->Render(m_Direct3DWrapper->GetDeviceContext());
 		sceneInfo.worldMatrix = model->adjustWorldmatrix(worldMatrix);
-		result = m_colShader->Render(m_Direct3DWrapper->GetDeviceContext(),m_Direct3DWrapper->GetDevice(), model->GetIndexCount(), sceneInfo, lightInfo, m_RenderTexture->GetShaderRessourceView(), model->GetTexture()->GetResourceView(),model->GetNormalMap()->GetResourceView(), model->GetDisplacementMap()->GetResourceView());
-		if (!result) return false;	
+		if (i != 9)
+		{
+			result = m_colShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), model->GetIndexCount(), sceneInfo, lightInfo, m_RenderTexture->GetShaderRessourceView(), model->GetTexture()->GetResourceView(), model->GetNormalMap()->GetResourceView(), model->GetDisplacementMap()->GetResourceView());
+			if (!result) return false;
+		}
+		else
+		{
+			result = m_colShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), model->GetIndexCount(), sceneInfo, lightInfo, m_RenderTexture->GetShaderRessourceView(), m_RenderTexture->GetShaderRessourceView(), m_RenderTexture->GetShaderRessourceView(), m_RenderTexture->GetShaderRessourceView());
+			if (!result) return false;
+		}
+		++i;
 	}
 	m_Direct3DWrapper->EnableAlphaBlending();
 	for each (ParticleSystem* ps in m_particleSystems)
@@ -620,7 +643,6 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 		}
 		if (length > 0 && length < std::numeric_limits<float>::infinity())
 		{
-			OutputDebugStringA("Yes");
 			int i = 0;
 			int index = std::numeric_limits<float>::infinity();
 			length = std::numeric_limits<float>::infinity();

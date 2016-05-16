@@ -40,6 +40,7 @@ struct PixelInputType
 	float3 binormal : BINORMAL;
 	float4 lightViewPosition : TEXCOORD1;
 	float3 lightPos : TEXCOORD2;
+	float4 worldposition : Position;
 };
 
 PixelInputType main(VertexInputType input)
@@ -52,6 +53,7 @@ PixelInputType main(VertexInputType input)
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
+	output.worldposition = output.position;
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
 

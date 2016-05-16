@@ -2,7 +2,7 @@
 
 #include <D3D11.h>
 #include <DirectXMath.h>
-#include <noise\noise.h>
+#include "noise\noise.h"
 extern int g_TriTable[][16];
 
 /*vertex decals description*/
