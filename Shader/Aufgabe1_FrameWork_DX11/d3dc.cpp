@@ -12,7 +12,8 @@ D3Dc::D3Dc()
 	m_depthBuffer = 0;
 	m_depthStencilState = 0;
 	m_depthStencilView = 0;
-	m_rasterState = 0;
+	m_rasterStateBackCulling = 0;
+	m_rasterStateFrontCulling = 0;
 }
 
 D3Dc::D3Dc(const D3Dc &other)
@@ -22,8 +23,10 @@ D3Dc::D3Dc(const D3Dc &other)
 
 D3Dc::~D3Dc()
 {
-	if (m_rasterState)
-		m_rasterState->Release();
+	if (m_rasterStateBackCulling)
+		m_rasterStateBackCulling->Release();
+	if (m_rasterStateFrontCulling)
+		m_rasterStateFrontCulling->Release();
 	if (m_depthStencilView)
 		m_depthStencilView->Release();
 	if (m_depthStencilState)
@@ -314,10 +317,25 @@ bool D3Dc::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool f
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
 
 	// Create rasterized state
-	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
+	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterStateBackCulling);
 	if (FAILED(result)) return false;
 
-	m_devCon->RSSetState(m_rasterState);
+	rasterDesc.AntialiasedLineEnable = false;
+	rasterDesc.CullMode = D3D11_CULL_FRONT;
+	rasterDesc.DepthBias = 0;
+	rasterDesc.DepthBiasClamp = 0.0f;
+	rasterDesc.DepthClipEnable = true;
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.MultisampleEnable = false;
+	rasterDesc.ScissorEnable = false;
+	rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+	// Create rasterized state
+	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterStateFrontCulling);
+	if (FAILED(result)) return false;
+
+	m_devCon->RSSetState(m_rasterStateBackCulling);
 
 	D3D11_BLEND_DESC blendDesc = {};
 

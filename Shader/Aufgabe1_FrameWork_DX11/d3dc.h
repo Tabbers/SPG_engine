@@ -47,6 +47,14 @@ public:
 	};
 	inline void D3Dc::SetBackBufferRenderTarget() {	m_devCon->OMSetRenderTargets(1, &m_targetView, m_depthStencilView); };
 
+	inline void EnableFrontCulling()
+	{
+		m_devCon->RSSetState(m_rasterStateFrontCulling);
+	}
+	inline void EnableBackCulling()
+	{
+		m_devCon->RSSetState(m_rasterStateBackCulling);
+	}
 	inline void EnableAlphaBlending() 
 	{
 		FLOAT blend[4] = { 1.0f,1.0f,1.0f,0.0f };
@@ -75,7 +83,8 @@ private:
 	ID3D11DepthStencilState* m_depthStencilState;
 	ID3D11DepthStencilView* m_depthStencilView;
 	ID3D11DepthStencilState* m_depthStencilParticleState;
-	ID3D11RasterizerState* m_rasterState;
+	ID3D11RasterizerState* m_rasterStateBackCulling;
+	ID3D11RasterizerState* m_rasterStateFrontCulling;
 	ID3D11Texture2D* m_backBufferPtr;
 	ID3D11BlendState* m_blendstateAlphaEnabled;
 	ID3D11BlendState* m_blendstateAlphaDisabled;

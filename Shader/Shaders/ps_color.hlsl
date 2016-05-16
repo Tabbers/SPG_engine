@@ -78,7 +78,7 @@ float ChebyshevUpperBound(float2 Moments, float t, float minVariance)
     float Variance = max(Moments.y - (Moments.x * Moments.x), minVariance);
   // Compute probabilistic upper bound.  
     float d = t - Moments.x;
-    float p_max = Linstep(0.2, 1.0, Variance / (Variance + d * d));
+    float p_max = Variance / (Variance + d * d);
     return clamp(max(p, p_max),0.0f,1.0f);
 }
 
@@ -159,7 +159,7 @@ float4 main(PixelInputType input) : SV_TARGET
     float distanceToLight;
     float MinVariance = 0.00002f;
 	specular = float4(0.0f,0.0f,0.0f,0.0f);
-    float contribution = 1.0f;
+    float contribution;
 
     uv = input.tex;
 	if(drawNormal)
@@ -200,19 +200,19 @@ float4 main(PixelInputType input) : SV_TARGET
     colorOut = ambientColor;
 	
 	// Calculate the projected texture coordinates.
-	projectTexCoord.x =  input.lightViewPosition.x / input.lightViewPosition.w / 2.0f + 0.5f;
-	projectTexCoord.y =  -input.lightViewPosition.y / input.lightViewPosition.w / 2.0f + 0.5f;
+	projectTexCoord.x =  input.lightViewPosition.x / input.lightViewPosition.w * 0.5 + 0.5f;
+	projectTexCoord.y =  -input.lightViewPosition.y / input.lightViewPosition.w * 0.5 + 0.5f;
 
 	if((saturate(projectTexCoord.x) == projectTexCoord.x) && (saturate(projectTexCoord.y) == projectTexCoord.y))
 	{
-		float bias = 0.1f;
+		float bias = 0.00001f;
 		// Calculate the depth of the light.
 		lightDepthValue = input.lightViewPosition.z / input.lightViewPosition.w;
 
 		lightDepthValue -= bias;
 
 		// Sample the shadow map depth value from the depth texture using the sampler at the projected texture coordinate location.
-		contribution = ShadowContribution(projectTexCoord, length(input.lightPos), MinVariance);
+		contribution = ShadowContribution(projectTexCoord, lightDepthValue, MinVariance);
 
 		// Calculate the amount of light on this pixel.
         lightIntensity = saturate(dot(bumpNormal, input.lightPos));
@@ -235,5 +235,5 @@ float4 main(PixelInputType input) : SV_TARGET
 	}
 	colorOut = textureColor*colorOut;
 	if(drawSpec) colorOut  = saturate(colorOut + specular);
-    return colorOut * (1-contribution);
+    return colorOut * contribution;
 }
