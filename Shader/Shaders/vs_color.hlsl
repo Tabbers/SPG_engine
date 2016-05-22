@@ -39,6 +39,7 @@ struct PixelInputType
 	float3 tangent : TANGENT;
 	float3 binormal : BINORMAL;
 	float4 lightViewPosition : TEXCOORD1;
+    float4 lightViewPositionVSM : VSM;
 	float3 lightPos : TEXCOORD2;
 	float4 worldposition : Position;
 };
@@ -61,6 +62,10 @@ PixelInputType main(VertexInputType input)
     output.lightViewPosition = mul(input.position, worldMatrix);
     output.lightViewPosition = mul(output.lightViewPosition, lightViewMatrix);
     output.lightViewPosition = mul(output.lightViewPosition, lightProjectionMatrix);
+
+    // Calculate the position of the vertice as viewed by the light source.
+    output.lightViewPositionVSM = mul(input.position, worldMatrix);
+    output.lightViewPositionVSM = mul(output.lightViewPositionVSM, lightViewMatrix);
 
 	// Store the input color for the pixel shader to use.
     output.tex = input.tex;
@@ -88,7 +93,6 @@ PixelInputType main(VertexInputType input)
 
     // Normalize the light position vector.
     output.lightPos = normalize(output.lightPos);
-
 	// Get the view Direction and possible Reflections
     worldPosition = mul(input.position, worldMatrix);
 	//Generate an view vector based on camera position and world position of the vertex

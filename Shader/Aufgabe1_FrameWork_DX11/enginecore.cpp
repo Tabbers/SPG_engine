@@ -126,8 +126,8 @@ void EngineCore::InitWindows(int &screenWidth, int &screenHeight)
 	RegisterClassEx(&wc);
 
 	//Set Resolution to 800x600
-	screenWidth = 800;
-	screenHeight = 600;
+	screenWidth = 1280;
+	screenHeight = 720;
 
 	//Set window to middle of the screen
 	posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;

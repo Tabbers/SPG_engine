@@ -2,33 +2,28 @@
 struct PixelInputType
 {
     float4 position : SV_POSITION;
-    float4 depthPosition : TEXTURE0;
+    float4 linearDepth : LDEPTH;
+    float4 fixedPointDepth : FPDEPTH;
 };
 
-float2 ComputeMoments(float Depth)
+float2 ComputMoments(float depth)
 {
-	float2 Moments;
-	// First moment is the depth itself.
-	Moments.x = Depth;
-	// Compute partial derivatives of depth.
-	float dx = ddx(Depth);
-	float dy = ddy(Depth);
-	// Compute second moment over the pixel extents.
-	Moments.y = Depth * Depth + 0.25 * (dx * dx + dy * dy);
-	return Moments;
+    float moment1 = depth;
+    float moment2 = depth * depth;
+	
+		// Adjusting moments (this is sort of bias per pixel) using partial derivative
+    float dx = ddx(depth);
+    float dy = ddy(depth);
+    moment2 += 0.25 * (dx * dx + dy * dy);
+    return float2(moment1, moment2);
 }
+
 float4 main(PixelInputType input) : SV_TARGET
 {
-	float depthValue;
-	float4 color;
-	
-	
+	float depth = 0.0f;
+    float fixedPointShadows = 0.0f;
 	// Get the depth value of the pixel by dividing the Z pixel depth by the homogeneous W coordinate.
-	depthValue = input.depthPosition.z / input.depthPosition.w;
-	float2 moments = ComputeMoments(depthValue);
-  
-
-    color = float4(moments ,0.0f, 1.0f);
-
-	return color;
+    depth = length(input.linearDepth);
+    fixedPointShadows = input.fixedPointDepth.z / input.fixedPointDepth.w;
+    return float4(ComputMoments(depth), fixedPointShadows, 1.0f);
 }

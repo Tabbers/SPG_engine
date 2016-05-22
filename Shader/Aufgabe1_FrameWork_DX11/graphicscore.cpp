@@ -80,7 +80,6 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	D3Dmodel* m_Model9 = nullptr;
 	D3Dmodel* m_Model10 = nullptr;
 	D3Dmodel* m_Model11 = nullptr;
-	ParticleSystem* ps = nullptr;
 
 	m_screenWidth = screenWidth;
 	m_screenHeight = screenHeight;
@@ -96,17 +95,12 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	m_genModel = new GeneratedModel();
 	m_genModel->Init('2', m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext());
 
-	tempPos = XMVectorSet(-4.0f, 0.0f, -2.0f, 0.0f);
-	ps = new ParticleSystem();
-	ps->Init(m_Direct3DWrapper->GetDevice(),m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot);
-	m_particleSystems.push_back(ps);
-
 	tempPos = XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f);
 	m_Camera = new D3DCamera();
 	if (!m_Camera) return false;
 	m_Camera->Init(screenWidth, screenHeight, m_Direct3DWrapper->GetDeviceContext(),tempPos,tempRot);
 
-	tempPos = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+	tempPos = XMVectorSet(0.0f, -3.0f, 0.0f, 0.0f);
 	m_Model = new D3Dmodel(m_modelLib);
 	if (!m_Model) return false;
 	result = m_Model->Init("Data/sht/cube.sht",L"",L"", L"", m_Direct3DWrapper->GetDevice(),m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot);
@@ -132,7 +126,7 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_Model3) return false;
 	result = m_Model3->Init("Data/sht/plane.sht", L"Texture/stones/text_ground.dds", L"Texture/stones/norm_ground.dds", L"Texture/stones/disp_ground.dds", m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot);
 	m_Model3->SetScale(25,1,25);
-	m_Model3->SetRenderOnShadowMap(false);
+	//m_Model3->SetRenderOnShadowMap(false)
 	if (!result) return false;
 	m_renderable.push_back(m_Model3);
 
@@ -142,7 +136,7 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	m_Light = new Light();
 	if (!m_Light) return false;
 	m_Light->Init(SHADOWMAP_WIDTH, SHADOWMAP_HEIGHT, m_Direct3DWrapper->GetDeviceContext(),tempPos,tempRot);
-	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
+	m_Light->SetAmbientColor(0.05f, 0.05f, 0.05f, 1.0f);
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -186,7 +180,7 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result) return false;
 	m_renderable.push_back(m_Model9);
 
-	tempPos = XMVectorSet(0.0f, 15.0f, 10.0f, 0.0f);
+	tempPos = XMVectorSet(-5.0f, 15.0f, 10.0f, 0.0f);
 	tempRot = XMQuaternionRotationRollPitchYaw(-PI/2, 0, 0);
 	m_Model11 = new D3Dmodel(m_modelLib);
 	if (!m_Model11) return false;
@@ -425,6 +419,20 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 				}
 			}
 		}
+		if (inKey->Keystate('H') && !inKey->KeystateOld('H'))
+		{
+			for each(D3Dmodel* model in m_renderable)
+			{
+				if (model->GetDrawhardShadows())
+				{
+					model->SetDrawHardShadows(false);
+				}
+				else
+				{
+					model->SetDrawHardShadows(true);
+				}
+			}
+		}
 		if (inKey->Keystate('P') && !inKey->KeystateOld('P'))
 		{
 			for each(D3Dmodel* model in m_renderable)
@@ -607,7 +615,8 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 	{
 		sceneInfo.DrawNormal = model->GetDrawNormalMap();
 		sceneInfo.DrawSpec   = model->GetDrawSpec();
-		sceneInfo.DrawDisp = model->GetDrawDisp();
+		sceneInfo.DrawDisp   = model->GetDrawDisp();
+		sceneInfo.DrawHardShadows = model->GetDrawhardShadows();
 		model->Render(m_Direct3DWrapper->GetDeviceContext());
 		sceneInfo.worldMatrix = model->adjustWorldmatrix(worldMatrix);
 		if (i != 9)
@@ -743,7 +752,7 @@ bool GraphicsCore::RenderTexture(bool Editmode, XMVECTOR translateL, XMVECTOR ro
 	m_RenderTexture->SetRenderTarget(m_Direct3DWrapper->GetDeviceContext());
 
 	// Clear the render to texture.
-	m_RenderTexture->ClearRenderTarget(m_Direct3DWrapper->GetDeviceContext(), {0.0f,0.0f,0.0f,0.0f });
+	m_RenderTexture->ClearRenderTarget(m_Direct3DWrapper->GetDeviceContext(), {1.0f,1.0f,1.0f,1.0f });
 	
 	m_Light->Render(translateL, rotateL, Editmode);
 

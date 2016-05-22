@@ -31,6 +31,8 @@ public:
 	inline bool	GetDrawSpec() { return m_drawSpecular; };
 	inline void	SetDrawDisp(bool drawDisplacement) { m_drawDisp = drawDisplacement; };
 	inline bool	GetDrawDisp() { return m_drawDisp; };
+	inline void	SetDrawHardShadows(bool HardShadows) { m_HardShadows = HardShadows; };
+	inline bool	GetDrawhardShadows() { return m_HardShadows; };
 protected:
 	XMVECTOR m_position;
 	XMVECTOR m_rotation;
@@ -40,5 +42,6 @@ protected:
 	bool m_drawNormalMap  = true;
 	bool m_drawSpecular   = true;
 	bool m_drawDisp = true;
+	bool m_HardShadows = true;
 };
 

@@ -24,7 +24,6 @@ public:
 	inline XMFLOAT3 GetXMFLOAT3Position() {
 		XMFLOAT3 Position;
 		Position.x = m_position.m128_f32[0];
-		Position.y = m_position.m128_f32[1];
 		Position.z = m_position.m128_f32[2];
 		return Position;
 	}

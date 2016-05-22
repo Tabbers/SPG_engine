@@ -169,13 +169,13 @@ bool ColorShader::InitShader(ID3D11Device* device, HWND hwnd, CHAR* vsFilename, 
 
 	m_sampleFilter = static_cast<D3D11_FILTER>(m_filtervalues[m_filter]);
 	// Create a texture sampler state description.
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	samplerDesc.MipLODBias = 0.0f;
-	samplerDesc.MaxAnisotropy = 1;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.MaxAnisotropy = 16;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	samplerDesc.BorderColor[0] = 0;
 	samplerDesc.BorderColor[1] = 0;
 	samplerDesc.BorderColor[2] = 0;
@@ -412,9 +412,43 @@ bool ColorShader::SetShaderParameters(ID3D11DeviceContext* devcon, ID3D11Device*
 	dataPtr2->specularColor     = lightInfo.specularColor;
 	dataPtr2->specularIntensity = lightInfo.specularIntensity;
 	dataPtr2->lightDirection    = lightInfo.lightDirection;
-	dataPtr2->drawNormal        = sceneInfo.DrawNormal;
-	dataPtr2->drawSpec		    = sceneInfo.DrawSpec;	
-	dataPtr2->drawDisp		    = sceneInfo.DrawDisp;
+	
+	if (sceneInfo.DrawNormal)
+	{
+		dataPtr2->switches.x = 1.0f;
+	}
+	else
+	{
+		dataPtr2->switches.x = 0.0f;
+	}
+	
+	if (sceneInfo.DrawSpec)
+	{
+		dataPtr2->switches.y = 1.0f;
+	}
+	else
+	{
+		dataPtr2->switches.y = 0.0f;
+	}
+
+	if (sceneInfo.DrawDisp)
+	{
+		dataPtr2->switches.z = 1.0f;
+	}
+	else
+	{
+		dataPtr2->switches.z = 0.0f;
+	}
+
+	if (sceneInfo.DrawHardShadows)
+	{
+		dataPtr2->switches.w = 1.0f;
+	}
+	else
+	{
+		dataPtr2->switches.w = 0.0f;
+	}
+
 	dataPtr2->stepsXRefiningStepsy.x = m_numberOfIterations;
 	dataPtr2->stepsXRefiningStepsy.y = m_refinementIterations;
 	// unlock light buffer

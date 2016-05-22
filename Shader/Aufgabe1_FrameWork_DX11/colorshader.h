@@ -27,12 +27,7 @@ private:
 		DirectX::XMFLOAT4 specularColor;
 		DirectX::XMFLOAT3 lightDirection;
 		float specularIntensity;
-		bool drawNormal;
-		DirectX::XMFLOAT3 padding;
-		bool drawSpec;
-		DirectX::XMFLOAT3 padding2;
-		bool drawDisp;
-		DirectX::XMFLOAT3 padding3;
+		DirectX::XMFLOAT4 switches;
 		DirectX::XMFLOAT2 stepsXRefiningStepsy;
 		DirectX::XMFLOAT2 padding5;
 	};
