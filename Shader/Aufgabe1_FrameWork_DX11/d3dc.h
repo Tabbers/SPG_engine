@@ -55,6 +55,10 @@ public:
 	{
 		m_devCon->RSSetState(m_rasterStateBackCulling);
 	}
+	inline void EnableWireframe()
+	{
+		m_devCon->RSSetState(m_rasterStateWireFrame);
+	}
 	inline void EnableAlphaBlending() 
 	{
 		FLOAT blend[4] = { 1.0f,1.0f,1.0f,0.0f };
@@ -69,9 +73,12 @@ public:
 		m_devCon->OMSetDepthStencilState(m_depthStencilState, 1);
 
 	};
+
+	bool g_Wireframe = false;
 private:
 	std::vector<IDXGIAdapter*> EnumerateAdapters(void);
 
+	bool m_Wireframe = false;
 	bool m_vsync_on;
 	int m_videoCardMemory;
 	char m_vCardDesc[128];
@@ -85,6 +92,7 @@ private:
 	ID3D11DepthStencilState* m_depthStencilParticleState;
 	ID3D11RasterizerState* m_rasterStateBackCulling;
 	ID3D11RasterizerState* m_rasterStateFrontCulling;
+	ID3D11RasterizerState* m_rasterStateWireFrame;
 	ID3D11Texture2D* m_backBufferPtr;
 	ID3D11BlendState* m_blendstateAlphaEnabled;
 	ID3D11BlendState* m_blendstateAlphaDisabled;

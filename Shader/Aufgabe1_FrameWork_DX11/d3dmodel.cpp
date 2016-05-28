@@ -44,11 +44,11 @@ bool D3Dmodel::Init(char* locationModel,wchar_t* locationTexture, wchar_t* locat
 	else result = m_Text->Init(device,devcon,locationTexture);
 
 	m_NormalMap = new Texture();
-	if (locationTexture == L"") result = m_NormalMap->Init(device, devcon, L"Texture/normal.dds");
+	if (locationNormal == L"") result = m_NormalMap->Init(device, devcon, L"Texture/normal.dds");
 	else result = m_NormalMap->Init(device, devcon, locationNormal);
 
 	m_DisplacementMap = new Texture();
-	if (locationTexture == L"") result = m_DisplacementMap->Init(device, devcon, L"Texture/displacement.dds");
+	if (locationDisp == L"") result = m_DisplacementMap->Init(device, devcon, L"Texture/displacement.dds");
 	else result = m_DisplacementMap->Init(device, devcon, locationDisp);
 
 	CalculateModelVectors();

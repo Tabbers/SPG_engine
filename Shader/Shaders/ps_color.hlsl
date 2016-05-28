@@ -229,6 +229,12 @@ float4 main(PixelInputType input) : SV_TARGET
         }
         else
         {
+            if (input.lightViewPosition.x < -1.0f || input.lightViewPosition.x > 1.0f ||
+                input.lightViewPosition.y < -1.0f || input.lightViewPosition.y > 1.0f ||
+                input.lightViewPosition.z < 0.0f || input.lightViewPosition.z > 1.0f)
+            {
+                return ambientColor;
+            }
             
             float lightDepthValue = length(input.lightViewPositionVSM);
             lightDepthValue -= 0.002;

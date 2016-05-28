@@ -12,10 +12,12 @@
 #include "depthShader.h"
 #include "lineShader.h"
 #include "generationShader.h"
+#include "TerrainShader.h"
 #include "kdTree.h"
 #include "line.h"
 #include "ParticleSystem.h"
 #include "generatedModel.h"
+#include "Terrain.h"
 #include <string>
 #include <windef.h>
 #include <iostream>
@@ -23,7 +25,7 @@
 GraphicsCore::GraphicsCore() :
 	m_path(nullptr), m_Direct3DWrapper(nullptr), m_Camera(nullptr),
 	m_colShader(nullptr), m_depthShader(nullptr), m_lineShader(nullptr), m_Light(nullptr),
-	m_kdtree(nullptr),m_modelLib(nullptr)
+	m_kdtree(nullptr),m_modelLib(nullptr),m_terrain(nullptr), m_terrainShader(nullptr), m_genShader(nullptr)
 {
 }
 
@@ -32,11 +34,14 @@ GraphicsCore::~GraphicsCore()
 	delete m_colShader;
 	delete m_depthShader;
 	delete m_lineShader;
+	delete m_terrainShader;
+	delete m_genShader;
 	delete m_path;
 	delete m_Camera;
 	delete m_Light;
 	delete m_Direct3DWrapper;
 	delete m_kdtree;
+	delete m_terrain;
 	m_collPoints.clear();
 	if (m_particleSystems.size() > 0)
 	{
@@ -156,7 +161,7 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result) return false;
 	m_renderable.push_back(m_Model5);
 
-	tempPos = XMVectorSet(10.0f, 30.0f, 10.0f, 0.0f);
+	tempPos = XMVectorSet(-10.0f, 20.0f, 5.0f, 0.0f);
 	m_Model6 = new D3Dmodel(m_modelLib);
 	if (!m_Model6) return false;
 	result = m_Model6->Init("Data/sht/sphere.sht", L"", L"", L"", m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot);
@@ -197,6 +202,9 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 
 	if (!result) return false;
 
+	m_terrain = new Terrain();
+	m_terrain->Init(L"", L"", m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot, 50, 10);
+
 	m_kdtree = new KdTree();
 
 	//Shader Initialisation
@@ -214,6 +222,10 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_lineShader) return false;
 	result = m_lineShader->Init(m_Direct3DWrapper->GetDevice(), hwnd);
 	if (!result) return false;
+
+	m_terrainShader = new TerrainShader();
+	if (!m_terrainShader->Init(m_Direct3DWrapper->GetDevice(), hwnd))
+		return false;
 
 	m_genShader = new GenerationShader();
 	if (FAILED(m_genShader->Init(m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext())))
@@ -461,6 +473,23 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 				}
 			}
 		}
+		if (inKey->Keystate('Z') && !inKey->KeystateOld('Z'))
+		{
+			if (!m_Direct3DWrapper->g_Wireframe)
+			{
+				m_Direct3DWrapper->g_Wireframe = true;
+				m_Direct3DWrapper->EnableWireframe();
+			}
+			else
+			{
+				m_Direct3DWrapper->g_Wireframe = false;
+				m_Direct3DWrapper->EnableBackCulling();
+			}
+		}
+		if (m_terrainShader != nullptr)
+		{
+			
+		}
 		// set number of iterations of RayMarching
 		if (m_colShader != nullptr)
 		{
@@ -631,6 +660,9 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 		}
 		++i;
 	}
+
+	m_terrain->Render(m_Direct3DWrapper->GetDeviceContext());
+
 	m_Direct3DWrapper->EnableAlphaBlending();
 	for each (ParticleSystem* ps in m_particleSystems)
 	{

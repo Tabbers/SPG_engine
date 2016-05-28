@@ -16,6 +16,7 @@ class Light;
 class ColorShader;
 class DepthShader;
 class LineShader;
+class TerrainShader;
 class DebugWindow;
 class Collision;
 class Line;
@@ -24,6 +25,7 @@ class ModelLibrary;
 class ParticleSystem;
 class GeneratedModel;
 class GenerationShader;
+class Terrain;
 
 class GraphicsCore
 {
@@ -49,11 +51,13 @@ private:
 	std::vector<Line*> m_conLines;
 	Light*	m_Light;
 	GeneratedModel* m_genModel;
+	Terrain* m_terrain;
 		
 	ColorShader* m_colShader;
 	DepthShader* m_depthShader;
 	LineShader* m_lineShader;
 	GenerationShader* m_genShader;
+	TerrainShader* m_terrainShader;
 
 	Path* m_path;
 	KdTree* m_kdtree;
