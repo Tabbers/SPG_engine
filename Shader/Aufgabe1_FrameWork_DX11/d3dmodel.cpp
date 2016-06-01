@@ -20,8 +20,14 @@ D3Dmodel::~D3Dmodel()
 {
 	ShutdownBuffers();
 	m_modelLib = nullptr;
-	delete m_Text;
-	delete m_NormalMap;
+	if (m_Text != nullptr)
+	{
+		delete m_Text;
+	}
+	if (m_NormalMap != nullptr)
+	{
+		delete m_NormalMap;
+	}
 }
 
 bool D3Dmodel::Init(char* locationModel,wchar_t* locationTexture, wchar_t* locationNormal, wchar_t* locationDisp, ID3D11Device * device, ID3D11DeviceContext* devcon, XMVECTOR position, XMVECTOR rotation)
@@ -173,8 +179,10 @@ bool D3Dmodel::InitBuffers(ID3D11Device * device, XMVECTOR position, XMVECTOR ro
 	if (FAILED(result)) return false;
 
 	// Release arrays
-	delete[] vertices;
-	vertices = 0;
+	if (vertices != nullptr)
+	{
+		delete[] vertices;
+	}
 
 	return true;
 }

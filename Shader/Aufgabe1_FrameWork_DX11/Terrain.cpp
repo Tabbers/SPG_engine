@@ -28,6 +28,8 @@ XMMATRIX Terrain::adjustWorldmatrix(XMMATRIX worldMatrix)
 
 bool Terrain::Init(wchar_t * locationTexture, wchar_t * locationDisp, ID3D11Device * device, ID3D11DeviceContext * devcon, XMVECTOR position, XMVECTOR rotation, unsigned int  dimension, unsigned int subDivisions)
 {
+	m_position = position;
+
 	bool result = true;
 	ulong* indices;
 	VertexType* vertices;
@@ -106,7 +108,7 @@ bool Terrain::Init(wchar_t * locationTexture, wchar_t * locationDisp, ID3D11Devi
 	indexBufferDesc.StructureByteStride = 0;
 
 	// pointer to index Data
-	indexData.pSysMem =indices;
+	indexData.pSysMem = indices;
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
 
@@ -114,8 +116,14 @@ bool Terrain::Init(wchar_t * locationTexture, wchar_t * locationDisp, ID3D11Devi
 	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
 	if (FAILED(result)) return false;
 
-	delete[] vertices;
-	delete[] indices;
+	if (vertices != nullptr)
+	{
+		delete[] vertices;
+	}
+	if (indices != nullptr)
+	{
+		delete[] indices;
+	}
 
 	return result;
 }

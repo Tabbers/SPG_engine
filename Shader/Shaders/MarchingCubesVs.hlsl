@@ -1,23 +1,22 @@
-//Once per frame constant buffer
-cbuffer ConstantBuffer : register(b0)
+
+struct VS_INPUT
 {
-	matrix World;
-	matrix View;
-	matrix Projection;
-}
+    float4 Pos : POSITION;
+    float4 Color : COLOR;
+};
 
 //Vertex shader output description
 struct VS_OUTPUT
 {
-	float4 Pos : SV_POSITION;
-	float4 Color : COLOR0;
+	float4 Pos : POSITION;
+	float4 Color : COLOR;
 };
 
 //Main vertex shader
-VS_OUTPUT main( float4 Pos : POSITION, float4 Color : COLOR)
+VS_OUTPUT main(VS_INPUT IN )
 {
-	VS_OUTPUT output = (VS_OUTPUT)0;
-	output.Pos = float4(Pos.xyz, 1);
-	output.Color = Color;
+	VS_OUTPUT output;
+	output.Pos = float4(IN.Pos.xyz, 1);
+    output.Color = IN.Color;
 	return output;
 }

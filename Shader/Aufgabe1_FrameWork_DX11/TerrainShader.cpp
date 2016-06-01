@@ -2,15 +2,16 @@
 
 
 
-TerrainShader::TerrainShader(): m_vertexShader(nullptr)
-							  , m_hullShader			(nullptr)
-							  , m_domainShader		(nullptr)
-							  , m_pixelShader		(nullptr)
-							  , m_layout				(nullptr)
-							  , m_samplerText		(nullptr)
-							  , m_samplerDisp		(nullptr)
-							  , m_matrixBuffer		(nullptr)
-							  , m_tesseletionBuffer	(nullptr)
+TerrainShader::TerrainShader() : m_vertexShader(nullptr)
+, m_hullShader(nullptr)
+, m_domainShader(nullptr)
+, m_pixelShader(nullptr)
+, m_layout(nullptr)
+, m_samplerText(nullptr)
+, m_samplerDisp(nullptr)
+, m_matrixBuffer(nullptr)
+, m_tesseletionBuffer(nullptr)
+, m_uniformTesseletionFactor(1u)
 {
 }
 
@@ -46,7 +47,7 @@ bool TerrainShader::Init(ID3D11Device *device, HWND hwnd)
 
 
 	// Initialize the vertex and pixel shaders.
-	result = InitShader(device, hwnd, "Shaders/vs_terrain.hlsl", "Shaders/ds_terrain.hlsl", "Shaders/hs_terrain.hlsl", "Shaders/ps_terrain.hlsl");
+	result = InitShader(device, hwnd, "Shaders/vs_terrain.hlsl", "Shaders/hs_terrain.hlsl", "Shaders/ds_terrain.hlsl", "Shaders/ps_terrain.hlsl");
 	if (!result) return false;
 	
 	return true;
@@ -56,6 +57,7 @@ bool TerrainShader::Render(ID3D11DeviceContext * devCon, ID3D11Device * device, 
 {
 	SetShaderParameters(devCon, device, sceneInfo, texture, heightmap);
 	RenderShader(devCon, indexCount);
+	return true;
 }
 
 bool TerrainShader::InitShader(ID3D11Device * device, HWND hwnd, CHAR *vsFilename, CHAR *hsFilename, CHAR *dsFilename, CHAR *psFilename)
@@ -85,7 +87,6 @@ bool TerrainShader::InitShader(ID3D11Device * device, HWND hwnd, CHAR *vsFilenam
 		return false;
 	}
 
-	wchar_t temp[100];
 	swprintf(temp, 100, L"%hs", hsFilename);
 	// Compile the vertex shader code.
 	result = D3DCompileFromFile(temp, NULL, NULL, "main", "hs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
@@ -98,7 +99,6 @@ bool TerrainShader::InitShader(ID3D11Device * device, HWND hwnd, CHAR *vsFilenam
 		return false;
 	}
 
-	wchar_t temp[100];
 	swprintf(temp, 100, L"%hs", dsFilename);
 	// Compile the vertex shader code.
 	result = D3DCompileFromFile(temp, NULL, NULL, "main", "ds_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
@@ -111,7 +111,6 @@ bool TerrainShader::InitShader(ID3D11Device * device, HWND hwnd, CHAR *vsFilenam
 		return false;
 	}
 
-	wchar_t temp[100];
 	swprintf(temp, 100, L"%hs", psFilename);
 	// Compile the vertex shader code.
 	result = D3DCompileFromFile(temp, NULL, NULL, "main", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
@@ -167,7 +166,10 @@ bool TerrainShader::InitShader(ID3D11Device * device, HWND hwnd, CHAR *vsFilenam
 	pixelShaderBuffer->Release();
 	hullShaderBuffer->Release();
 	domainShaderBuffer->Release();
-	errorMessage->Release();
+	if (errorMessage != nullptr)
+	{
+		errorMessage->Release();
+	}
 
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
@@ -207,6 +209,13 @@ bool TerrainShader::InitShader(ID3D11Device * device, HWND hwnd, CHAR *vsFilenam
 	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
 	if (FAILED(result)) return false;
 
+	matrixBufferDesc.ByteWidth = sizeof(TesselationBufferType);
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_tesseletionBuffer);
+	if (FAILED(result)) return false;
+
+	return true;
 }
 
 void TerrainShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, CHAR* shaderFilename)
@@ -278,12 +287,11 @@ bool TerrainShader::SetShaderParameters(ID3D11DeviceContext * devCon, ID3D11Devi
 	dataPtr2 = (TesselationBufferType*)mappedResource.pData;
 
 	// Copy the matrices into the constant buffer.
-	dataPtr2->edgefactors = DirectX::XMFLOAT4(m_uniformTesseletionFactor, m_uniformTesseletionFactor, m_uniformTesseletionFactor, m_uniformTesseletionFactor);
-	dataPtr2->innerfactors = DirectX::XMFLOAT2(m_uniformTesseletionFactor, m_uniformTesseletionFactor);
+	dataPtr2->edgefactors  = DirectX::XMFLOAT4(m_uniformTesseletionFactor, m_uniformTesseletionFactor, m_uniformTesseletionFactor, m_uniformTesseletionFactor);
+	dataPtr2->innerfactors = DirectX::XMFLOAT4(m_uniformTesseletionFactor, m_uniformTesseletionFactor,1.0f,1.0f);
 
 	// Unlock the constant buffer.
 	devCon->Unmap(m_tesseletionBuffer, 0);
-
 
 	//Set Ressources
 

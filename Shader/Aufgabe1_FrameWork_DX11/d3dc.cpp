@@ -172,7 +172,10 @@ bool D3Dc::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool f
 
 
 	// release unneeded values
-	delete[] displayModeList;
+	if (displayModeList != nullptr)
+	{
+		delete[] displayModeList;
+	}
 	for each (IDXGIAdapter* adapter in adapters)
 	{
 		adapter->Release();
@@ -309,7 +312,7 @@ bool D3Dc::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool f
 
 	// Set up rasterization
 	rasterDesc.AntialiasedLineEnable = false;
-	rasterDesc.CullMode = D3D11_CULL_BACK;
+	rasterDesc.CullMode = D3D11_CULL_NONE;
 	rasterDesc.DepthBias = 0;
 	rasterDesc.DepthBiasClamp = 0.0f;
 	rasterDesc.DepthClipEnable = true;

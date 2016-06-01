@@ -13,25 +13,32 @@ GenerationShader::~GenerationShader()
 
 HRESULT GenerationShader::Init(ID3D11Device * device, ID3D11DeviceContext * devcon)
 {
+	D3D11_BUFFER_DESC matrixBufferDesc;
+	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
+	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferTypeGeneration);
+	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	matrixBufferDesc.MiscFlags = 0;
+	matrixBufferDesc.StructureByteStride = 0;
 
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(MatrixBufferType);
-	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bd.CPUAccessFlags = 0;
-	HRESULT hr = device->CreateBuffer(&bd, NULL, &m_matrixBuffer);
-	if (FAILED(hr))
-		return hr;
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	HRESULT result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
+	if (FAILED(result)) return false;
 
-	if (FAILED(hr = InitShader(device, devcon)))
-		return hr;
+	if (FAILED(result = InitShader(device, devcon)))
+		return result;
 
 	return S_OK;
 }
 
 void GenerationShader::Render(ID3D11DeviceContext* devcon, ID3D11Device* device, MatricesGen sceneInfo,GeneratedModel* model)
 {
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT result;
+
+	MatricesGen* dataPtr;
+
 	ID3D11Buffer* buff = model->GetSamplePointBuffer();
 	ID3D11ShaderResourceView* denstiyData = model->GetDensityData();
 	ID3D11ShaderResourceView* sampleTable = model->GetTable();
@@ -39,11 +46,27 @@ void GenerationShader::Render(ID3D11DeviceContext* devcon, ID3D11Device* device,
 	ID3D11ShaderResourceView* textureY = model->getTextureY()->GetResourceView();
 	ID3D11ShaderResourceView* textureZ = model->getTextureZ()->GetResourceView();
 
-	devcon->UpdateSubresource(m_matrixBuffer, 0, NULL, &sceneInfo, 0, 0);
+	// Transpose the matrices to prepare them for the shader.
+	sceneInfo.world = XMMatrixTranspose(sceneInfo.world);
+	sceneInfo.view = XMMatrixTranspose(sceneInfo.view);
+	sceneInfo.projection = XMMatrixTranspose(sceneInfo.projection);
+
+	result = devcon->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
+	// Get a pointer to the data in the constant buffer.
+	dataPtr = (MatricesGen*)mappedResource.pData;
+
+	// Copy the matrices into the constant buffer.
+	dataPtr->world = sceneInfo.world;
+	dataPtr->view = sceneInfo.view;
+	dataPtr->projection = sceneInfo.projection;
+
+	dataPtr->LightPostion = sceneInfo.LightPostion;
+	// Unlock the constant buffer.
+	devcon->Unmap(m_matrixBuffer, 0);
 
 	//Enable vertex shader
 	devcon->VSSetShader(m_VertexShader, NULL, 0);
-	devcon->VSSetConstantBuffers(0, 1, &m_matrixBuffer);
 
 	//Enable geometry shader
 	devcon->GSSetShader(m_GeometryShader, NULL, 0);
@@ -74,9 +97,6 @@ void GenerationShader::Render(ID3D11DeviceContext* devcon, ID3D11Device* device,
 	unsigned int vertexCount = model->GetVolume()->GetVertexCount();
 	devcon->Draw(vertexCount, 0);
 
-	UINT offset2 = 0u;
-	ID3D11Buffer* pBuffer = nullptr;
-	devcon->SOSetTargets(1, &pBuffer, &offset2);
 	devcon->GSSetShader(nullptr, nullptr, 0);
 	devcon->VSSetShader(nullptr, nullptr, 0);
 	devcon->PSSetShader(nullptr, nullptr, 0);
@@ -129,32 +149,8 @@ HRESULT GenerationShader::InitShader(ID3D11Device * device, ID3D11DeviceContext 
 	if (FAILED(hr))
 		return hr;
 
-	//stream output stage input signature declaration
-	D3D11_SO_DECLARATION_ENTRY decl[] =
-	{
-		{ 0, "SV_POSITION", 0, 0, 4, 0 },
-		{ 0, "COLOR", 0, 0, 4, 0 },
-		{ 0, "TEXCOORD", 0, 0, 4, 0 },
-	};
-	UINT stream = (UINT)0;
-	hr = device->CreateGeometryShaderWithStreamOutput
-		(
-			gsBlob->GetBufferPointer(),
-			gsBlob->GetBufferSize(),
-			decl,  //so declaration
-			(UINT)3, //numentries
-			NULL,
-			0,
-			stream, //rasterized stream
-			NULL, //pointert to class linkage (not needed)
-			&m_GeometryShader
-			);
-
-	gsBlob->Release();
-	if (FAILED(hr))
-	{
-		return hr;
-	}
+	hr = device->CreateGeometryShader(gsBlob->GetBufferPointer(),gsBlob->GetBufferSize(), nullptr, &m_GeometryShader);
+	if (FAILED(hr))	return S_FALSE;
 
 	//compile and create pixel shader
 	ID3DBlob* psBlob = NULL;

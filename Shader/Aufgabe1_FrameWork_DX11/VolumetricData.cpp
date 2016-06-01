@@ -11,7 +11,10 @@ m_height(Height), m_width(Width), m_depth(Depth), m_cubeSize(CubeSize), m_cubeSt
 }
 VolumetricData::~VolumetricData()
 {
-	delete[] m_data;
+	if (m_data != nullptr)
+	{
+		delete[] m_data;
+	}
 	//todo delete other stuff as well...
 }
 

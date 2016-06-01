@@ -20,15 +20,11 @@ struct MatricesGen
 	{
 		this->world = world;
 		this->view = view;
-		this->projection = projection;
+		this->projection =projection;
 		this->LightPostion.x = LightPostion.m128_f32[0];
 		this->LightPostion.y = LightPostion.m128_f32[1];
 		this->LightPostion.z = LightPostion.m128_f32[2];
 		this->LightPostion.w = LightPostion.m128_f32[3];
-	}
-	inline MatricesGen()
-	{
-
 	}
 	~MatricesGen()
 	{

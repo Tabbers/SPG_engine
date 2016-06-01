@@ -8,16 +8,28 @@ KdTree::KdTree()
 	coll = new Collision();
 }
 
-KdTree::~KdTree() 
+KdTree::~KdTree()
 {
-	if (this->root != 0) delete this->root;
+	if (root != nullptr)
+	{
+		delete root;
+	}
 }
 
 KdNode::~KdNode() 
 {
-	if (this->children[0] != nullptr) delete this->children[0];
-	if (this->children[1] != nullptr) delete this->children[1];
-	if (this->triangles != nullptr) delete this->triangles;
+	if (this->children[0] != nullptr)
+	{
+		delete children[0];
+	}
+	if (this->children[1] != nullptr)
+	{
+		delete children[1];
+	}
+	if (this->triangles != nullptr)
+	{
+		delete triangles;
+	}
 }
 void KdTree::Init(std::vector<Triangle*>* triangles, ID3D11Device* device, XMFLOAT3 color)
 {

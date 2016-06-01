@@ -31,17 +31,50 @@ GraphicsCore::GraphicsCore() :
 
 GraphicsCore::~GraphicsCore()
 {
-	delete m_colShader;
-	delete m_depthShader;
-	delete m_lineShader;
-	delete m_terrainShader;
-	delete m_genShader;
-	delete m_path;
-	delete m_Camera;
-	delete m_Light;
-	delete m_Direct3DWrapper;
-	delete m_kdtree;
-	delete m_terrain;
+	if (m_colShader != nullptr)
+	{
+		delete m_colShader;
+	}
+	if (m_depthShader != nullptr)
+	{
+		delete m_depthShader;
+	}
+	if (m_lineShader != nullptr)
+	{
+		delete m_lineShader;
+	}
+	if (m_terrainShader != nullptr)
+	{
+		delete m_terrainShader;
+	}
+	if (m_genShader != nullptr)
+	{
+		delete m_genShader;
+	}
+	if (m_path != nullptr)
+	{
+		delete m_path;
+	}
+	if (m_Camera != nullptr)
+	{
+		delete m_Camera;
+	}
+	if (m_Light != nullptr)
+	{
+		delete m_Light;
+	}
+	if (m_Direct3DWrapper != nullptr)
+	{
+		delete m_Direct3DWrapper;
+	}
+	if (m_kdtree != nullptr)
+	{
+		delete m_kdtree;
+	}
+	if (m_terrain != nullptr)
+	{
+		delete m_terrain;
+	}
 	m_collPoints.clear();
 	if (m_particleSystems.size() > 0)
 	{
@@ -105,7 +138,7 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_Camera) return false;
 	m_Camera->Init(screenWidth, screenHeight, m_Direct3DWrapper->GetDeviceContext(),tempPos,tempRot);
 
-	tempPos = XMVectorSet(0.0f, -3.0f, 0.0f, 0.0f);
+	tempPos = XMVectorSet(-5.0f, -3.0f, 0.0f, 0.0f);
 	m_Model = new D3Dmodel(m_modelLib);
 	if (!m_Model) return false;
 	result = m_Model->Init("Data/sht/cube.sht",L"",L"", L"", m_Direct3DWrapper->GetDevice(),m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot);
@@ -126,12 +159,11 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result) return false;
 	m_renderable.push_back(m_Model2);
 
-	tempPos = XMVectorSet(0.0f,-5.0f, 0.0f, 0.0f);
+	tempPos = XMVectorSet(0.0f,-10.0f, 0.0f, 0.0f);
 	m_Model3 = new D3Dmodel(m_modelLib);
 	if (!m_Model3) return false;
 	result = m_Model3->Init("Data/sht/plane.sht", L"Texture/stones/text_ground.dds", L"Texture/stones/norm_ground.dds", L"Texture/stones/disp_ground.dds", m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot);
 	m_Model3->SetScale(25,1,25);
-	//m_Model3->SetRenderOnShadowMap(false)
 	if (!result) return false;
 	m_renderable.push_back(m_Model3);
 
@@ -185,13 +217,12 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result) return false;
 	m_renderable.push_back(m_Model9);
 
-	tempPos = XMVectorSet(-5.0f, 15.0f, 10.0f, 0.0f);
+	tempPos = XMVectorSet(0.0f, 15.0f, 10.0f, 0.0f);
 	tempRot = XMQuaternionRotationRollPitchYaw(-PI/2, 0, 0);
 	m_Model11 = new D3Dmodel(m_modelLib);
 	if (!m_Model11) return false;
 	result = m_Model11->Init("Data/sht/plane.sht", L"Texture/stones/text_ground.dds", L"Texture/stones/norm_ground.dds", L"Texture/stones/disp_ground.dds", m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot);
 	m_Model11->SetScale(10, 1, 10);
-	m_Model11->SetRenderOnShadowMap(false);
 	if (!result) return false;
 	m_renderable.push_back(m_Model11);
 
@@ -202,8 +233,9 @@ bool GraphicsCore::Init(int screenWidth, int screenHeight, HWND hwnd)
 
 	if (!result) return false;
 
+	tempPos = XMVectorSet(100.0f, 0.0f, 0.0f, 0.0f);
 	m_terrain = new Terrain();
-	m_terrain->Init(L"", L"", m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot, 50, 10);
+	m_terrain->Init(L"Texture/terrain/text_terrain.dds", L"Texture/terrain/height_terrain.dds", m_Direct3DWrapper->GetDevice(), m_Direct3DWrapper->GetDeviceContext(), tempPos, tempRot, 100, 10);
 
 	m_kdtree = new KdTree();
 
@@ -404,17 +436,24 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 			else msaa = 0;
 			m_Direct3DWrapper->SetMSAA(msaa);
 			
-			delete(m_RenderTexture);
-			m_RenderTexture = new D3DRenderToTexture();
-			if (!m_RenderTexture) return false;
-			result = m_RenderTexture->Init(m_Direct3DWrapper->GetDevice(), SHADOWMAP_WIDTH, SHADOWMAP_HEIGHT,
-				m_Direct3DWrapper->GetMSAASettings().SampleCounts[m_Direct3DWrapper->GetMSAA()], m_Direct3DWrapper->GetMSAASettings().QualityLevel[m_Direct3DWrapper->GetMSAA()], DXGI_FORMAT_R32G32B32A32_FLOAT);
-			if (!result) return false;
-
-			delete(m_msaaText);
-			m_msaaText = new D3DRenderToTexture();
-			m_msaaText->Init(m_Direct3DWrapper->GetDevice(),m_screenWidth,m_screenHeight,
+			if (m_RenderTexture != nullptr)
+			{
+				delete m_RenderTexture ;
+			
+				m_RenderTexture = new D3DRenderToTexture();
+				if (!m_RenderTexture) return false;
+				result = m_RenderTexture->Init(m_Direct3DWrapper->GetDevice(), SHADOWMAP_WIDTH, SHADOWMAP_HEIGHT,
+					m_Direct3DWrapper->GetMSAASettings().SampleCounts[m_Direct3DWrapper->GetMSAA()], m_Direct3DWrapper->GetMSAASettings().QualityLevel[m_Direct3DWrapper->GetMSAA()], DXGI_FORMAT_R32G32B32A32_FLOAT);
+				if (!result) return false;
+			}
+			if (m_msaaText != nullptr)
+			{
+				delete m_msaaText;
+			
+				m_msaaText = new D3DRenderToTexture();
+				m_msaaText->Init(m_Direct3DWrapper->GetDevice(),m_screenWidth,m_screenHeight,
 				m_Direct3DWrapper->GetMSAASettings().SampleCounts[m_Direct3DWrapper->GetMSAA()], m_Direct3DWrapper->GetMSAASettings().QualityLevel[m_Direct3DWrapper->GetMSAA()], DXGI_FORMAT_R8G8B8A8_UNORM);
+			}
 			SetWindowNameOnFilterChange();
 		}
 		if (inKey->Keystate('N') && !inKey->KeystateOld('N'))
@@ -488,7 +527,24 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 		}
 		if (m_terrainShader != nullptr)
 		{
-			
+			if (inKey->Keystate('5') && !inKey->KeystateOld('5'))
+			{
+				int it = m_terrainShader->GetUniformTesseletionFactor();
+				if (it > 1)
+					it--;
+				m_terrainShader->SetUniformTesseletionFactor(it);
+
+				std::cout << "Uniform Tesseletionfactor: " << it << std::endl;
+			}
+			if (inKey->Keystate('6') && !inKey->KeystateOld('6'))
+			{
+				int it = m_terrainShader->GetUniformTesseletionFactor();
+				if (it < 63)
+					it++;
+				m_terrainShader->SetUniformTesseletionFactor(it);
+
+				std::cout << "Uniform Tesseletionfactor:  " << it << std::endl;
+			}
 		}
 		// set number of iterations of RayMarching
 		if (m_colShader != nullptr)
@@ -620,8 +676,6 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 
 	m_renderable[4]->SetPosition(m_Light->GetPosition());
 	m_renderable[4]->SetRotation(m_Light->GetRotation());
-
-	m_genShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), mg, m_genModel);
 	
 	for each(Line* line in 	m_conLines)
 	{
@@ -639,29 +693,32 @@ bool GraphicsCore::Render(float delta_time, Input* inKey, bool Editmode)
 		m_kdtree->Render(m_Direct3DWrapper->GetDeviceContext());
 		result = m_lineShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), m_kdtree->GetIndexCount(), sceneInfo);
 	}
-	unsigned int i = 0;
-	for each (D3Dmodel* model in m_renderable)
+	
+	for (unsigned int i = 0; i < m_renderable.size(); ++i)
 	{
-		sceneInfo.DrawNormal = model->GetDrawNormalMap();
-		sceneInfo.DrawSpec   = model->GetDrawSpec();
-		sceneInfo.DrawDisp   = model->GetDrawDisp();
-		sceneInfo.DrawHardShadows = model->GetDrawhardShadows();
-		model->Render(m_Direct3DWrapper->GetDeviceContext());
-		sceneInfo.worldMatrix = model->adjustWorldmatrix(worldMatrix);
+		sceneInfo.DrawNormal = m_renderable[i]->GetDrawNormalMap();
+		sceneInfo.DrawSpec   = m_renderable[i]->GetDrawSpec();
+		sceneInfo.DrawDisp   = m_renderable[i]->GetDrawDisp();
+		sceneInfo.DrawHardShadows = m_renderable[i]->GetDrawhardShadows();
+		m_renderable[i]->Render(m_Direct3DWrapper->GetDeviceContext());
+		sceneInfo.worldMatrix = m_renderable[i]->adjustWorldmatrix(worldMatrix);
 		if (i != 9)
 		{
-			result = m_colShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), model->GetIndexCount(), sceneInfo, lightInfo, m_RenderTexture->GetShaderRessourceView(), model->GetTexture()->GetResourceView(), model->GetNormalMap()->GetResourceView(), model->GetDisplacementMap()->GetResourceView());
+			result = m_colShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), m_renderable[i]->GetIndexCount(), sceneInfo, lightInfo, m_RenderTexture->GetShaderRessourceView(), m_renderable[i]->GetTexture()->GetResourceView(), m_renderable[i]->GetNormalMap()->GetResourceView(), m_renderable[i]->GetDisplacementMap()->GetResourceView());
 			if (!result) return false;
 		}
 		else
 		{
-			result = m_colShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), model->GetIndexCount(), sceneInfo, lightInfo, m_RenderTexture->GetShaderRessourceView(), m_RenderTexture->GetShaderRessourceView(), m_RenderTexture->GetShaderRessourceView(), m_RenderTexture->GetShaderRessourceView());
+			result = m_colShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), m_renderable[i]->GetIndexCount(), sceneInfo, lightInfo, m_RenderTexture->GetShaderRessourceView(), m_RenderTexture->GetShaderRessourceView(), m_RenderTexture->GetShaderRessourceView(), m_RenderTexture->GetShaderRessourceView());
 			if (!result) return false;
 		}
-		++i;
 	}
 
+	sceneInfo.worldMatrix = m_terrain->adjustWorldmatrix(worldMatrix);
 	m_terrain->Render(m_Direct3DWrapper->GetDeviceContext());
+	m_terrainShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), m_terrain->GetIndexCount(), sceneInfo, m_terrain->GetTexture()->GetResourceView(), m_terrain->GetDisplacementMap()->GetResourceView());
+	
+	m_genShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_Direct3DWrapper->GetDevice(), mg, m_genModel);
 
 	m_Direct3DWrapper->EnableAlphaBlending();
 	for each (ParticleSystem* ps in m_particleSystems)
@@ -792,12 +849,12 @@ bool GraphicsCore::RenderTexture(bool Editmode, XMVECTOR translateL, XMVECTOR ro
 	m_Light->GetViewMatrix(lightViewMatrix);
 	m_Light->GetProjectionMatrix(lightProjectionMatrix);
 
-	for each (D3Dmodel* model in m_renderable)
+	for (unsigned int i = 0u; i < m_renderable.size(); ++i)
 	{
-		if (model->GetRenderOnShadowMap())
+		if (m_renderable[i]->GetRenderOnShadowMap())
 		{
-			model->Render(m_Direct3DWrapper->GetDeviceContext());
-			result = m_depthShader->Render(m_Direct3DWrapper->GetDeviceContext(), model->GetIndexCount(), model->adjustWorldmatrix(worldMatrix), lightViewMatrix, lightProjectionMatrix);
+			m_renderable[i]->Render(m_Direct3DWrapper->GetDeviceContext());
+			result = m_depthShader->Render(m_Direct3DWrapper->GetDeviceContext(), m_renderable[i]->GetIndexCount(), m_renderable[i]->adjustWorldmatrix(worldMatrix), lightViewMatrix, lightProjectionMatrix);
 			if (!result) return false;
 		}
 	}

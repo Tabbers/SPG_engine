@@ -121,8 +121,7 @@ float chebyshevUpperBound(float distance, float2 uv)
 	// We retrive the two moments previously stored (depth and depth*depth)
     float2 moments = SampleShadowMapXByY(uv);
 	// Surface is fully lit. as the current fragment is before the light occluder
-    float p = (distance <= moments.x);
-    	
+    float p = distance <= moments.x;
 		// The fragment is either in shadow or penumbra. We now use chebyshev's upperBound to check
 		// How likely this pixel is to be lit (p_max)
     float variance = moments.y - (moments.x * moments.x);
@@ -202,7 +201,7 @@ float4 main(PixelInputType input) : SV_TARGET
         {
            	float  lightDepthValue = input.lightViewPosition.z / input.lightViewPosition.w;
             depthValue = depthMapTexture.SampleLevel(SampleTypeClamp, projectTexCoord,0).z;
-            lightDepthValue -= 0.00005;
+            lightDepthValue -= 0.00005f;
             if (lightDepthValue <= depthValue)
             {
 		        // Calculate the amount of light on this pixel.
@@ -228,16 +227,9 @@ float4 main(PixelInputType input) : SV_TARGET
             }
         }
         else
-        {
-            if (input.lightViewPosition.x < -1.0f || input.lightViewPosition.x > 1.0f ||
-                input.lightViewPosition.y < -1.0f || input.lightViewPosition.y > 1.0f ||
-                input.lightViewPosition.z < 0.0f || input.lightViewPosition.z > 1.0f)
-            {
-                return ambientColor;
-            }
-            
+        {   
             float lightDepthValue = length(input.lightViewPositionVSM);
-            lightDepthValue -= 0.002;
+            lightDepthValue -= 0.0002f;
             float ShadowContribution = chebyshevUpperBound(lightDepthValue, projectTexCoord);
 
 		    // Calculate the amount of light on this pixel.

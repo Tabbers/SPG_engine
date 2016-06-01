@@ -20,7 +20,7 @@ HRESULT GeneratedModel::Init(char type, ID3D11Device * device, ID3D11DeviceConte
 	//2.0f to decrease density
 	DirectX::XMFLOAT3 cubeStep(2.0f / cubeSize.x, 2.0f / cubeSize.y, 2.0f / cubeSize.z);
 
-	if (m_vol != NULL)
+	if (m_vol != nullptr)
 	{
 		delete m_vol;
 		m_vol= NULL;
@@ -29,7 +29,10 @@ HRESULT GeneratedModel::Init(char type, ID3D11Device * device, ID3D11DeviceConte
 	HRESULT  hr;
 	if (FAILED(hr = m_vol->CreateTestData(type,device)))
 	{
-		delete m_vol;
+		if (m_vol != nullptr)
+		{
+			delete m_vol;
+		}
 		return hr;
 	}
 
@@ -37,7 +40,10 @@ HRESULT GeneratedModel::Init(char type, ID3D11Device * device, ID3D11DeviceConte
 
 	if (FAILED(hr = m_vol->CreateTriTableResource(device)))
 	{
-		delete m_vol;
+		if (m_vol != nullptr)
+		{
+			delete m_vol;
+		}
 		return hr;
 	}
 
@@ -117,11 +123,6 @@ HRESULT GeneratedModel::InitBuffers(ID3D11Device * device, ID3D11DeviceContext *
 	hr = device->CreateBuffer(&soBufferDesc, NULL, &soBuffer);
 	if (FAILED(hr))
 		return hr;
-
-	//put the SO buffer to use
-	UINT soffset[1] = { 0 };
-	//UINT* offset = 
-	//devcon->SOSetTargets(1, &soBuffer, soffset);
 
 	return S_OK;
 }

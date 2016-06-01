@@ -7,8 +7,14 @@ EngineCore::EngineCore():
 
 EngineCore::~EngineCore()
 {
-	delete graphObj;
-	delete inputObj;
+	if (graphObj != nullptr)
+	{
+		delete graphObj;
+	}
+	if (inputObj != nullptr)
+	{
+		delete inputObj;
+	}
 	ShutdownWindows();
 }
 

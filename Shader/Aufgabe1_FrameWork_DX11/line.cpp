@@ -82,7 +82,10 @@ bool Line::InitBuffers(ID3D11Device* device,XMVECTOR s, XMVECTOR e, XMFLOAT3 col
 	if (FAILED(result)) return false;
 
 	// Release arrays
-	delete[] vertices;
+	if (vertices != nullptr)
+	{
+		delete[] vertices;
+	}
 	vertices = 0;
 
 	return true;

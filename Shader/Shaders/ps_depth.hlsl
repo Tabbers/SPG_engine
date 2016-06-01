@@ -23,6 +23,7 @@ float4 main(PixelInputType input) : SV_TARGET
 	float depth = 0.0f;
     float fixedPointShadows = 0.0f;
 	// Get the depth value of the pixel by dividing the Z pixel depth by the homogeneous W coordinate.
+    input.linearDepth = input.linearDepth / input.linearDepth.w;
     depth = length(input.linearDepth);
     fixedPointShadows = input.fixedPointDepth.z / input.fixedPointDepth.w;
     return float4(ComputMoments(depth), fixedPointShadows, 1.0f);

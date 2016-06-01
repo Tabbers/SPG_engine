@@ -14,14 +14,12 @@ private:
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
 	};
-public:
-
 	struct TesselationBufferType
 	{
 		DirectX::XMFLOAT4 edgefactors;
-		DirectX::XMFLOAT2 innerfactors;
+		DirectX::XMFLOAT4 innerfactors;
 	};
-
+public:
 	TerrainShader();
 	~TerrainShader();
 	bool Init(ID3D11Device*, HWND);
